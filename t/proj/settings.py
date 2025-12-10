@@ -35,7 +35,6 @@ try:
             'PASSWORD': os.getenv('DB_POSTGRES_PASSWORD', 'postgres'),
             'OPTIONS': {
                 'connect_timeout': 1000,
-
             },
             'CONN_MAX_AGE': None,
         },

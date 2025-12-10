@@ -1,4 +1,5 @@
 import datetime
+import time
 import json
 import pickle
 import re
@@ -16,6 +17,7 @@ from django.test import TransactionTestCase
 
 from django_celery_results.backends.database import DatabaseBackend
 from django_celery_results.models import ChordCounter, TaskResult
+from django.db import connections
 
 
 class SomeClass:
@@ -24,7 +26,7 @@ class SomeClass:
         self.data = data
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures('depends_on_current_app')
 class test_DatabaseBackend:
 
@@ -549,6 +551,25 @@ class test_DatabaseBackend:
         # check task_result object
         tr = TaskResult.objects.get(task_id=tid2)
         assert json.loads(tr.meta) == {'key': 'value', 'children': []}
+
+    def test_backend__task_result_closes_stale_connection(self):
+        tid = uuid()
+        request = self._create_request(
+            task_id=tid,
+            name='my_task',
+            args=[],
+            kwargs={},
+            task_protocol=1,
+        )
+        # simulate a stale connection by setting the close time
+        # to the current time
+        db_conn_wrapper = connections[self.b.TaskModel.objects.db]
+        db_conn_wrapper.close_at = time.monotonic()
+        current_db_connection = db_conn_wrapper.connection
+        self.b.mark_as_done(tid, None, request=request)
+        # Validate the connection was replaced in the process
+        # of saving the task
+        assert current_db_connection is not db_conn_wrapper.connection
 
     def test_backend__task_result_date(self):
         tid2 = uuid()

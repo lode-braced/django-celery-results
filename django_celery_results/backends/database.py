@@ -128,7 +128,7 @@ class DatabaseBackend(BaseDictBackend):
         # we ensure it still has a valid connection, just like
         # Django does after a request to ensure a
         # clean connection for the next request.
-        (connections[self.TaskModel._default_manager.db]
+        (connections[router.db_for_write(self.TaskModel)]
          .close_if_unusable_or_obsolete())
 
         content_type, content_encoding, result = self.encode_content(result)

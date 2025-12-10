@@ -563,7 +563,7 @@ class test_DatabaseBackend:
         )
         # simulate a stale connection by setting the close time
         # to the current time
-        db_conn_wrapper = connections[self.b.TaskModel.objects.db]
+        db_conn_wrapper = connections[router.db_for_write(self.b.TaskModel)]
         db_conn_wrapper.close_at = time.monotonic()
         current_db_connection = db_conn_wrapper.connection
         self.b.mark_as_done(tid, None, request=request)

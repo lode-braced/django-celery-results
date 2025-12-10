@@ -13,7 +13,7 @@ from celery.result import AsyncResult, GroupResult
 from celery.utils.serialization import b64decode
 from celery.worker.request import Request
 from celery.worker.strategy import hybrid_to_proto2
-from django.db import connections
+from django.db import connections, router
 from django.test import TransactionTestCase
 
 from django_celery_results.backends.database import DatabaseBackend

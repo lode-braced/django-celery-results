@@ -1,8 +1,8 @@
 import datetime
-import time
 import json
 import pickle
 import re
+import time
 from unittest import mock
 
 import celery
@@ -13,11 +13,11 @@ from celery.result import AsyncResult, GroupResult
 from celery.utils.serialization import b64decode
 from celery.worker.request import Request
 from celery.worker.strategy import hybrid_to_proto2
+from django.db import connections
 from django.test import TransactionTestCase
 
 from django_celery_results.backends.database import DatabaseBackend
 from django_celery_results.models import ChordCounter, TaskResult
-from django.db import connections
 
 
 class SomeClass:
